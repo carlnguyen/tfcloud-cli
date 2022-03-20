@@ -1,0 +1,18 @@
+clouds:
+  CollectionX:
+    - name: ExampleVarset
+      description: "A set of variables"
+      workspaces:
+        - type: workspaces
+          id: ws-xxxxxxxxxxxxx
+      data:
+        - type: vars
+          attributes:
+            key: NAME
+            value: nam
+            category: env
+        - type: vars
+          attributes:
+            key: PASSWORD
+            value: 123123123123
+            category: env
