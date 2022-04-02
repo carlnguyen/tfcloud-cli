@@ -1,7 +1,22 @@
 import requests
 
 class TerraformCloudApi(object):
-    base_url = "https://app.terraform.io/api/v2"
+    def __init__(self, org, tf_cloud_token):
+        self.org = org
+        self.tf_cloud_token = tf_cloud_token
+        self.headers = {
+            "Authorization": f"Bearer {tf_cloud_token}",
+            "Content-Type": "application/vnd.api+json"
+        }
+        self.base_url = "https://app.terraform.io/api/v2"
+
+    def list_varsets(self):
+        url = self.base_url + f"/organizations/{self.org}/varsets"
+        req = requests.get(
+                    url=url,
+                    headers=self.headers,
+                )
+        return req.content.decode("utf-8")
 
     def get_varset_id(self, org, tf_cloud_token, varset_name):
         url = self.base_url + f"/organizations/{org}/varsets"
@@ -134,3 +149,7 @@ class TerraformCloudApi(object):
                     print(req.content.decode(utf-8) + "\n")
             else:
                 print(f"Varset {varset_name} is not found")
+
+    def create_varsets(self):
+        tmp = json.loads(open("varset.json"))
+        varset_obj = Default

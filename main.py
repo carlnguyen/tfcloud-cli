@@ -11,12 +11,37 @@ vcs_providers= {
                 "oauth_token_id": ""
             }
     }
-
 @click.group()
-def cli():
-    pass
+@click.option("--org", help="Organization name", required=True)
+@click.option("--token", help="Terraform cloud token, can be specified by TF_CLOUD_TOKEN", default=None)
+@click.pass_context
+def root(ctx, org, token):
+    if token:
+        tf_token=token
+    elif os.environ.get('TF_CLOUD_TOKEN'):
+        tf_token=os.environ['TF_CLOUD_TOKEN']
 
-@cli.command()
+    if not tf_token:
+        click.echo("Terraform cloud token is not found")
+
+    ctx.ensure_object(dict)
+    ctx.obj['TF_CLASS'] = tf(org=org, tf_cloud_token=token)
+
+@root.command()
+@click.pass_context
+def list_varsets(ctx):
+    tf = ctx.obj['TF_CLASS']
+    result = tf.list_varsets()
+    click.echo(result)
+
+@root.command()
+@click.pass_context
+def create_varsets(ctx):
+    tf = ctx.obj['TF_CLASS']
+    result = tf.list_varsets()
+    click.echo(result)
+
+@root.command()
 @click.option("--org", help="Organization name", required=True)
 @click.option("--working_dir", help="Working directory in the repository", required=True)
 @click.option("--branch", help="Branch to watch in the repository", required=True)
@@ -32,7 +57,7 @@ def create_workspace(org, name, branch, working_dir):
             workspace_name=name
         )
 
-@cli.command()
+@root.command()
 @click.option("--org", help="Organization name", required=True)
 @click.option("--cloud", help="Cloud in clouds_config.yaml to create varsets", required=True)
 def create_varsets(org, cloud):
@@ -43,7 +68,7 @@ def create_varsets(org, cloud):
             vars_set=variable_sets["clouds"][cloud]
         )
 
-@cli.command()
+@root.command()
 @click.option("--cloud", help="Cloud in clouds_config.yaml to create varsets", required=True)
 @click.option("--org", help="Organization name", required=True)
 def update_varset_workspaces(org, cloud):
@@ -57,4 +82,4 @@ def update_varset_workspaces(org, cloud):
 
 
 if __name__ == '__main__':
-    cli()
+    root()
